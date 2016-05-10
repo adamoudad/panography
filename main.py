@@ -1,4 +1,5 @@
 import cv2
+import numpy as np
 
 from Detection import detect
 from Matching import BruteForce, knnBruteForce, FLANN
@@ -25,11 +26,11 @@ matches = BruteForce(d[0],d[1])
 image_matching = cv2.drawMatches(images[0],k[0],images[1],k[1],matches[:10],images[0],flags=2,)
 cv2.imwrite(output_path + 'matching_BF.jpg',image_matching)
 
-# Brute Force Matching with knn
-matches = knnBruteForce(d[0],d[1])
-# cv2.drawMatchesKnn expects list of lists as matches.
-image_matching = cv2.drawMatchesKnn(images[0],k[0],images[1],k[1],matches,images[0],flags=2)
-cv2.imwrite(output_path + 'matching_knnBF.jpg',image_matching)
+# # Brute Force Matching with knn
+# matches = knnBruteForce(d[0],d[1])
+# # cv2.drawMatchesKnn expects list of lists as matches.
+# image_matching = cv2.drawMatchesKnn(images[0],k[0],images[1],k[1],matches,images[0],flags=2)
+# cv2.imwrite(output_path + 'matching_knnBF.jpg',image_matching)
 
 # # FLANN matching (Not working)
 # matches, matchesMask = FLANN(d[0],d[1])
@@ -39,3 +40,20 @@ cv2.imwrite(output_path + 'matching_knnBF.jpg',image_matching)
 #                    flags = 0)
 # image_matching = cv2.drawMatchesKnn(images[0],k[0],images[1],k[1],matches,None,**draw_params)
 # cv2.imwrite(output_path + 'matching_FLANN.jpg',image_matching)
+
+# Homography
+MIN_MATCH_COUNT = 10
+if len(matches)>MIN_MATCH_COUNT:
+    src_pts = np.float32([ k[0][m.queryIdx].pt for m in matches ]).reshape(-1,1,2)
+    dst_pts = np.float32([ k[1][m.trainIdx].pt for m in matches ]).reshape(-1,1,2)
+
+    M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC,5.0)
+    matchesMask = mask.ravel().tolist()
+
+    h,w = images[0].shape[:2]
+    pts = np.float32([ [0,0],[0,h-1],[w-1,h-1],[w-1,0] ]).reshape(-1,1,2)
+    print(images[1])
+    dst = cv2.perspectiveTransform(pts,M)
+else:
+    print("Not enough matches are found - {0}/{1}".format(len(matches),MIN_MATCH_COUNT))
+    matchesMask = None
