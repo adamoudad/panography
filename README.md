@@ -1,6 +1,9 @@
 # Panography
 Small Computer Vision project for image stitching in panography
-Python with Opencv
+Python with OpenCV and NumPy.
+
+This code can create a panorama from two images for now.
+Next improvement should enable panorama from n images.
 
 # Flow
 * Finding Keypoints and Descriptors
