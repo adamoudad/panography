@@ -1,7 +1,7 @@
 import cv2
 
 # Find Keypoints and Descriptors
-def detect(images_list, method="sift"):
+def sift(images_list):
     sift = cv2.xfeatures2d.SIFT_create()
     keypoints_list,descriptors_list = [],[]
     for i in images_list:
