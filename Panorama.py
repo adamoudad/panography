@@ -1,7 +1,8 @@
 import cv2
 import numpy as np
-import Matching
+
 from Detection import Detector
+from Matching import Matcher
 
 class Panorama:
     def __init__(self,images):
@@ -10,13 +11,14 @@ class Panorama:
         self.output = None
         self.descriptors = None
         self.detector = Detector("SIFT")
-
+        self.matcher = Matcher("BF")
+        
     def generate(self):
         self.output = self.source[0]
         for image in self.source[1:]:
             self.keypoints, self.descriptors = self.detector(self.output)
             k_source,d_source = self.detector(self.source[1])
-            matches = self.match(self.descriptors,d_source)
+            matches = self.matcher(self.descriptors,d_source)
             self.stitch(image,k_source,matches)
             self.crop()
 
