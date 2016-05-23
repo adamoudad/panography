@@ -4,31 +4,39 @@ import Matching
 import Detection
 
 class Panorama:
-    def __init__(self):
+    def __init__(self,images):
         self.min_matches = 10
-        self.panorama = None
-    def stitch(self,images):
-        k,d = self.detect(images)
-        matches = self.match(d)
+        self.source = images
+        self.output = None
+        self.descriptors = None
+
+    def generate(self):
+        self.output = self.source[0]
+        for image in self.source[1:]:
+            self.keypoints, self.descriptors = self.detect(self.output)
+            k_source,d_source = self.detect(self.source[1])
+            matches = self.match(self.descriptors,d_source)
+            self.stitch(image,k_source,matches)
+            self.crop()
+
+    def stitch(self,image,keypoints,matches):
         if len(matches)>self.min_matches:
-            pts_0 = np.float32([ k[0][m.queryIdx].pt for m in matches ])
-            pts_1 = np.float32([ k[1][m.trainIdx].pt for m in matches ])
-        
-            M, mask = cv2.findHomography(pts_1, pts_0, cv2.RANSAC,5.0)
-        
-            result = cv2.warpPerspective(images[1],M,(images[0].shape[1]+images[1].shape[1],max(images[0].shape[0],images[1].shape[0])))
-            result[:images[0].shape[0],:images[0].shape[1]] = images[0] 
-
-            self.output = result
+            pts_0 = np.float32([ self.keypoints[m.queryIdx].pt for m in matches ])
+            pts_1 = np.float32([ keypoints[m.trainIdx].pt for m in matches ])
             
+            M, mask = cv2.findHomography(pts_1, pts_0, cv2.RANSAC,5.0)
+            
+            result = cv2.warpPerspective(image,M,(self.output.shape[1]+image.shape[1],max(self.output.shape[0],image.shape[0])))
+            result[:self.output.shape[0],:self.output.shape[1]] = self.output 
+            self.output = result
         else:
-            print("Not enough matches are found - {0}/{1}".format(len(matches),MIN_MATCH_COUNT))
+            print("Not enough matches are found - {0}/{1}".format(len(matches),self.min_matches))
 
-    def detect(self,images, method="SIFT"):
-        return Detection.sift(images)
+    def detect(self,image, method="SIFT"):
+        return Detection.sift(image)
         
-    def match(self,descriptors,method="BF"):
-        return Matching.BruteForce(descriptors[0],descriptors[1])
+    def match(self,descriptors1,descriptors2,method="BF"):
+        return Matching.BruteForce(descriptors1,descriptors2)
         # matches = knnBruteForce(d[0],d[1])
         # # FLANN matching (Not working)
         # matches, matchesMask = FLANN(d[0],d[1])
@@ -43,4 +51,18 @@ class Panorama:
         if self.output is not None:
             cv2.imwrite(path,self.output)
         else:
-            print("Panorama is not generated")
+            print("Please generate the panorama first.")
+
+    def crop(self):
+        """
+        Crop black edges of the resulting panorama
+        """
+        if self.output is not None:
+            gray = cv2.cvtColor(self.output,cv2.COLOR_BGR2GRAY)
+            _,thresh = cv2.threshold(gray,1,255,cv2.THRESH_BINARY)
+            _,contours,hierarchy = cv2.findContours(thresh,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
+            cnt = contours[0]
+            x,y,w,h = cv2.boundingRect(cnt)
+            self.output = self.output[y:y+h,x:x+w]
+        else:
+            print("Please generate the panorama first.")

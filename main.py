@@ -8,6 +8,6 @@ images = [
     cv2.imread(source_path + "2.jpg"),
 ]
 
-p = Panorama()
-p.stitch(images)
+p = Panorama(images)
+p.generate()
 p.export(output_path + "panorama.jpg")
