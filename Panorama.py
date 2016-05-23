@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 import Matching
-import Detection
+from Detection import Detector
 
 class Panorama:
     def __init__(self,images):
@@ -9,12 +9,13 @@ class Panorama:
         self.source = images
         self.output = None
         self.descriptors = None
+        self.detector = Detector("SIFT")
 
     def generate(self):
         self.output = self.source[0]
         for image in self.source[1:]:
-            self.keypoints, self.descriptors = self.detect(self.output)
-            k_source,d_source = self.detect(self.source[1])
+            self.keypoints, self.descriptors = self.detector(self.output)
+            k_source,d_source = self.detector(self.source[1])
             matches = self.match(self.descriptors,d_source)
             self.stitch(image,k_source,matches)
             self.crop()
@@ -32,9 +33,6 @@ class Panorama:
         else:
             print("Not enough matches are found - {0}/{1}".format(len(matches),self.min_matches))
 
-    def detect(self,image, method="SIFT"):
-        return Detection.sift(image)
-        
     def match(self,descriptors1,descriptors2,method="BF"):
         return Matching.BruteForce(descriptors1,descriptors2)
         # matches = knnBruteForce(d[0],d[1])
