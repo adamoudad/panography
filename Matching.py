@@ -70,3 +70,21 @@ def FLANN(d1,d2):
 
 # plt.imshow(img3, 'gray'),plt.show()
     
+class Matcher:
+    def __init__(self,method="BF"):
+        self.method = method
+        
+    def __call__(self,descriptors1,descriptors2):
+        return getattr(self,self.method)(descriptors1,descriptors2)
+        
+    def BF(self,descriptors1,descriptors2):
+        """
+        Brute Force matching
+        Requires 2 descriptors in argument
+        """
+        # create BFMatcher object
+        bf = cv2.BFMatcher(cv2.NORM_L2, crossCheck=True)
+        # Match descriptors.
+        matches = bf.match(descriptors1,descriptors2)
+        # Sort them in the order of their distance.
+        return sorted(matches, key = lambda x:x.distance)
