@@ -6,7 +6,6 @@ class Detector:
         
     def __call__(self,image):
         return getattr(self,self.method)(image)
-        # return self.__getattr__(self.method)(image)
     
     def SIFT(self,image):
         sift = cv2.xfeatures2d.SIFT_create()
