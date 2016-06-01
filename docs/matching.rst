@@ -1,0 +1,5 @@
+Matching
+========
+
+.. automodule:: Matching
+   :members:

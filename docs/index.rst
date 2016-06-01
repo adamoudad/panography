@@ -11,7 +11,8 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-
+   panorama
+   matching
 
 Indices and tables
 ==================
