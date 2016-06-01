@@ -1,3 +1,8 @@
+"""
+Panorama class
+
+"""
+
 import cv2
 import numpy as np
 
@@ -5,6 +10,9 @@ from Detection import Detector
 from Matching import Matcher
 
 class Panorama:
+    """
+    Main panorama class for generating panorama from images
+    """
     def __init__(self,images):
         self.min_matches = 10
         self.source = images
