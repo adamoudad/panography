@@ -30,10 +30,10 @@ class Matcher:
         good = []
         for m,n in matches:
             if m.distance < 0.75*n.distance:
-                good.append([m])
+                good.append(m)
         return good
 
-    def FLANN(descriptors1,descriptors2):
+    def FLANN(self,descriptors1,descriptors2):
         # FLANN parameters
         FLANN_INDEX_KDTREE = 0
         index_params = dict(algorithm = FLANN_INDEX_KDTREE, trees = 5)
