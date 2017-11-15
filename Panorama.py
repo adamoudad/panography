@@ -13,13 +13,13 @@ class Panorama:
     """
     Main panorama class for generating panorama from images
     """
-    def __init__(self,images):
+    def __init__(self,images,detection="SIFT",matching="BF"):
         self.min_matches = 10
         self.source = images
         self.output = None
         self.descriptors = None
-        self.detector = Detector("SIFT")
-        self.matcher = Matcher("BF")
+        self.detector = Detector(detection)
+        self.matcher = Matcher(matching)
         
     def generate(self):
         self.output = self.source[0]
@@ -28,7 +28,10 @@ class Panorama:
             k_source,d_source = self.detector(self.source[1])
             matches = self.matcher(self.descriptors,d_source)
             self.stitch(image,k_source,matches)
-            self.crop()
+            # self.crop()
+            # print("Stitched.")
+            # self.export("outputs/intermediate.png")
+            # print("Exported.")
 
     def stitch(self,image,keypoints,matches):
         if len(matches)>self.min_matches:
