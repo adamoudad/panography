@@ -7,7 +7,6 @@ This code can create a panorama from a list of images.
 * [Usage](#usage)
 * [Note](#note)
 
-<a name="howitworks"/>
 # How it works
 The class Panorama manage the list of images to be stitched into one full panorama.
 The three main steps are :
@@ -27,7 +26,6 @@ Brute Force and Brute Force Knn are the two (most basic) algorithms used for mat
 ## Stitching
 It encompasses as well finding the homography transformation, and computing this transformation. Stitching is then done by appending the reference image for the homography.
 
-<a name="usage"/>
 # Usage
 You need to create two directories for the source and output images :
 * ./sources/ for the images that will be stitched into a panorama
@@ -35,6 +33,5 @@ You need to create two directories for the source and output images :
 
 Then just change the main.py to your convenience.
 
-<a name="note"/>
 # Note
 I try to provide a code easy to read and concise. Also, please feel free to tell me some weird things you might see in there ;).
